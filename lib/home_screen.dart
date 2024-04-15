@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:temari_bet_elearning_app/video_lesson_details_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -92,18 +93,21 @@ class HomeScreen extends StatelessWidget {
                       'Lesson 1',
                       'Introduction to Math',
                       'assets/images/Lesson1.png',
+                      () => _navigateToVideoLessonDetails(context, 'Lesson 1'),
                     ),
                     SizedBox(width: 16),
                     _buildPopularLessonCard(
                       'Lesson 2',
                       'Introduction to English',
                       'assets/images/Lesson2.png',
+                      () => _navigateToVideoLessonDetails(context, 'Lesson 2'),
                     ),
                     SizedBox(width: 16),
                     _buildPopularLessonCard(
                       'Lesson 3',
                       'Introduction to Science',
                       'assets/images/Lesson3.png',
+                      () => _navigateToVideoLessonDetails(context, 'Lesson 3'),
                     ),
                   ],
                 ),
@@ -214,37 +218,49 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPopularLessonCard(
-      String lessonTitle, String lessonDescription, String imagePath) {
-    return Container(
-      width: 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-              width: 200,
-              height: 120,
+  Widget _buildPopularLessonCard(String lessonTitle, String lessonDescription,
+      String imagePath, Function() onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                width: 200,
+                height: 120,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            lessonTitle,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              lessonTitle,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            lessonDescription,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            SizedBox(height: 4),
+            Text(
+              lessonDescription,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToVideoLessonDetails(BuildContext context, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VideoLessonDetailsScreen(title: title),
       ),
     );
   }
