@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:temari_bet_elearning_app/video_lesson_details_screen.dart';
+import 'package:temari_bet_elearning_app/video_player_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -7,7 +7,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0), // Adjust the padding here
+          padding: const EdgeInsets.only(left: 8.0),
           child: Image.asset(
             'assets/images/App Logo.png',
             width: 30,
@@ -93,21 +93,24 @@ class HomeScreen extends StatelessWidget {
                       'Lesson 1',
                       'Introduction to Math',
                       'assets/images/Lesson1.png',
-                      () => _navigateToVideoLessonDetails(context, 'Lesson 1'),
+                      () => _navigateToVideoPlayer(
+                          context, 'Lesson 1', 'Introduction to Math'),
                     ),
                     SizedBox(width: 16),
                     _buildPopularLessonCard(
                       'Lesson 2',
                       'Introduction to English',
                       'assets/images/Lesson2.png',
-                      () => _navigateToVideoLessonDetails(context, 'Lesson 2'),
+                      () => _navigateToVideoPlayer(
+                          context, 'Lesson 2', 'Introduction to English'),
                     ),
                     SizedBox(width: 16),
                     _buildPopularLessonCard(
                       'Lesson 3',
                       'Introduction to Science',
                       'assets/images/Lesson3.png',
-                      () => _navigateToVideoLessonDetails(context, 'Lesson 3'),
+                      () => _navigateToVideoPlayer(
+                          context, 'Lesson 3', 'Introduction to Science'),
                     ),
                   ],
                 ),
@@ -256,11 +259,15 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToVideoLessonDetails(BuildContext context, String title) {
+  void _navigateToVideoPlayer(
+      BuildContext context, String title, String description) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VideoLessonDetailsScreen(title: title),
+        builder: (context) => VideoPlayerScreen(
+          videoTitle: title,
+          videoDescription: description,
+        ),
       ),
     );
   }
