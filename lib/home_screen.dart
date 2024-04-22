@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:temari_bet_elearning_app/course_lessons_screen.dart';
 import 'package:temari_bet_elearning_app/video_player_screen.dart';
+import 'package:temari_bet_elearning_app/calendar_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -142,7 +143,14 @@ class HomeScreen extends StatelessWidget {
             ),
             IconButton(
               icon: Icon(Icons.calendar_today),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CalendarScreen(),
+                  ),
+                );
+              },
             ),
             IconButton(
               icon: Icon(Icons.person),
