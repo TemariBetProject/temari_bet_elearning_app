@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:temari_bet_elearning_app/course_lessons_screen.dart';
 import 'package:temari_bet_elearning_app/video_player_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -55,25 +56,33 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 24),
               _buildGradeSection('Grade 7', [
-                _buildCourseCard('Math', Colors.lightGreen, Icons.calculate),
-                _buildCourseCard('English', Colors.lightGreen, Icons.language),
-                _buildCourseCard('Science', Colors.lightGreen, Icons.science),
-                _buildCourseCard(
-                    'Amharic', Colors.lightGreen, Icons.text_fields),
-                _buildCourseCard(
-                    'Social Science', Colors.lightGreen, Icons.group),
-                _buildCourseCard('Civics', Colors.lightGreen, Icons.people),
+                _buildCourseCard(context, 'Math', Colors.lightGreen,
+                    Icons.calculate, 'Math Course'),
+                _buildCourseCard(context, 'English', Colors.lightGreen,
+                    Icons.language, 'English Course'),
+                _buildCourseCard(context, 'Science', Colors.lightGreen,
+                    Icons.science, 'Science Course'),
+                _buildCourseCard(context, 'Amharic', Colors.lightGreen,
+                    Icons.text_fields, 'Amharic Course'),
+                _buildCourseCard(context, 'Social Science', Colors.lightGreen,
+                    Icons.group, 'Social Science Course'),
+                _buildCourseCard(context, 'Civics', Colors.lightGreen,
+                    Icons.people, 'Civics Course'),
               ]),
               SizedBox(height: 24),
               _buildGradeSection('Grade 8', [
-                _buildCourseCard('Math', Colors.lightBlue, Icons.calculate),
-                _buildCourseCard('English', Colors.lightBlue, Icons.language),
-                _buildCourseCard('Science', Colors.lightBlue, Icons.science),
-                _buildCourseCard(
-                    'Amharic', Colors.lightBlue, Icons.text_fields),
-                _buildCourseCard(
-                    'Social Science', Colors.lightBlue, Icons.group),
-                _buildCourseCard('Civics', Colors.lightBlue, Icons.people),
+                _buildCourseCard(context, 'Math', Colors.lightBlue,
+                    Icons.calculate, 'Math Course'),
+                _buildCourseCard(context, 'English', Colors.lightBlue,
+                    Icons.language, 'English Course'),
+                _buildCourseCard(context, 'Science', Colors.lightBlue,
+                    Icons.science, 'Science Course'),
+                _buildCourseCard(context, 'Amharic', Colors.lightBlue,
+                    Icons.text_fields, 'Amharic Course'),
+                _buildCourseCard(context, 'Social Science', Colors.lightBlue,
+                    Icons.group, 'Social Science Course'),
+                _buildCourseCard(context, 'Civics', Colors.lightBlue,
+                    Icons.people, 'Civics Course'),
               ]),
               SizedBox(height: 24),
               Text(
@@ -168,52 +177,64 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseCard(String title, Color color, IconData icon) {
-    return Container(
-      width: 80,
-      height: 80,
-      margin: EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: Offset(0, 3),
+  Widget _buildCourseCard(BuildContext context, String title, Color color,
+      IconData icon, String courseName) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to course lessons screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CourseLessonsScreen(courseName: courseName),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color.withOpacity(0.8), color.withOpacity(0.6)],
+        );
+      },
+      child: Container(
+        width: 80,
+        height: 80,
+        margin: EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: Offset(0, 3),
             ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 28,
-                  color: Colors.white,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [color.withOpacity(0.8), color.withOpacity(0.6)],
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 28,
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
                   ),
-                ),
-              ],
+                  SizedBox(height: 8),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -29,7 +29,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.137.117:3000/getvideo?Title=${widget.videoTitle}'),
+            'http://10.161.65.75:3000/getvideo?Title=${widget.videoTitle}'),
       );
       final responseData = json.decode(response.body);
       return responseData['videoLink'];
