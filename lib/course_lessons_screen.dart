@@ -1,53 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // for JSON decoding
 import 'package:temari_bet_elearning_app/video_player_screen.dart';
 
-class CourseLessonsScreen extends StatelessWidget {
+class CourseLessonsScreen extends StatefulWidget {
   final String courseName;
 
   const CourseLessonsScreen({Key? key, required this.courseName})
       : super(key: key);
 
   @override
+  _CourseLessonsScreenState createState() => _CourseLessonsScreenState();
+}
+
+class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
+  final String baseUrl = 'http://192.168.253.188:3000/uploads/';
+
+  List<dynamic> lessons = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchLessons();
+  }
+
+  Future<void> fetchLessons() async {
+    try {
+      var url = Uri.parse(
+          'http://192.168.253.188:3000/get_video_data_by_course?course=${widget.courseName}');
+      print("Fetching data from: $url"); // This will print the URL being used
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        var data = json.decode(response.body);
+        print("API response: $data");
+        if (data['status']) {
+          setState(() {
+            lessons = data[
+                'videoData']; // Assuming 'videoData' contains the list of lessons
+          });
+        } else {
+          throw Exception('No video data found');
+        }
+      } else {
+        throw Exception('Failed to load lessons');
+      }
+    } catch (e) {
+      print('Error fetching lessons: $e');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to fetch lessons: $e')));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(courseName),
+        title: Text(widget.courseName),
       ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          _buildCourseLessonCard(
-            'Lesson 1',
-            'Introduction to $courseName Lesson 1',
-            'assets/images/Lesson1.png',
-            () => _navigateToVideoPlayer(
-                context, 'Lesson 1', 'Introduction to $courseName Lesson 1'),
-          ),
-          SizedBox(height: 16),
-          _buildCourseLessonCard(
-            'Lesson 2',
-            'Introduction to $courseName Lesson 2',
-            'assets/images/Lesson2.png',
-            () => _navigateToVideoPlayer(
-                context, 'Lesson 2', 'Introduction to $courseName Lesson 2'),
-          ),
-          SizedBox(height: 16),
-          _buildCourseLessonCard(
-            'Lesson 3',
-            'Introduction to $courseName Lesson 3',
-            'assets/images/Lesson3.png',
-            () => _navigateToVideoPlayer(
-                context, 'Lesson 3', 'Introduction to $courseName Lesson 3'),
-          ),
-        ],
-      ),
+      body: lessons.isEmpty
+          ? Center(
+              child: Text("No lessons available for ${widget.courseName}",
+                  style: TextStyle(fontSize: 16)))
+          : ListView.builder(
+              padding: EdgeInsets.all(16),
+              itemCount: lessons.length,
+              itemBuilder: (context, index) {
+                var lesson = lessons[index];
+                return _buildCourseLessonCard(
+                  lesson['Title'],
+                  lesson['Description'],
+                  baseUrl + lesson['image'], // Ensure the image URL is correct
+                  lesson[
+                      'urlLink'], // Assuming 'urlLink' is the key for the video URL in the data
+                  () => _navigateToVideoPlayer(
+                      context,
+                      lesson['Title'],
+                      lesson['Description'],
+                      lesson['urlLink']), // Pass the video URL here
+                );
+              },
+            ),
     );
   }
 
   Widget _buildCourseLessonCard(String lessonTitle, String lessonDescription,
-      String imagePath, Function() onTap) {
+      String imagePath, String videoUrl, Function onTap) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap as void Function(),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -72,7 +111,7 @@ class CourseLessonsScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
+                  child: Image.network(
                     imagePath,
                     fit: BoxFit.cover,
                     width: double.infinity,
@@ -103,13 +142,14 @@ class CourseLessonsScreen extends StatelessWidget {
   }
 
   void _navigateToVideoPlayer(
-      BuildContext context, String title, String description) {
+      BuildContext context, String title, String description, String videoUrl) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => VideoPlayerScreen(
           videoTitle: title,
           videoDescription: description,
+          videoUrl: videoUrl, // Pass the video URL to the video player
         ),
       ),
     );

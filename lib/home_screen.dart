@@ -94,37 +94,6 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.black87,
                 ),
               ),
-              SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildPopularLessonCard(
-                      'Lesson 1',
-                      'Introduction to Math',
-                      'assets/images/Lesson1.png',
-                      () => _navigateToVideoPlayer(
-                          context, 'Lesson 1', 'Introduction to Math'),
-                    ),
-                    SizedBox(width: 16),
-                    _buildPopularLessonCard(
-                      'Lesson 2',
-                      'Introduction to English',
-                      'assets/images/Lesson2.png',
-                      () => _navigateToVideoPlayer(
-                          context, 'Lesson 2', 'Introduction to English'),
-                    ),
-                    SizedBox(width: 16),
-                    _buildPopularLessonCard(
-                      'Lesson 3',
-                      'Introduction to Science',
-                      'assets/images/Lesson3.png',
-                      () => _navigateToVideoPlayer(
-                          context, 'Lesson 3', 'Introduction to Science'),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -193,7 +162,9 @@ class HomeScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => CourseLessonsScreen(courseName: courseName),
+            builder: (context) => CourseLessonsScreen(
+                courseName:
+                    title), // Use 'title' directly instead of 'courseName'
           ),
         );
       },
@@ -233,7 +204,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    title,
+                    title, // Display title here
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
@@ -283,19 +254,6 @@ class HomeScreen extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _navigateToVideoPlayer(
-      BuildContext context, String title, String description) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VideoPlayerScreen(
-          videoTitle: title,
-          videoDescription: description,
         ),
       ),
     );
