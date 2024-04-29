@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:temari_bet_elearning_app/course_lessons_screen.dart';
 import 'package:temari_bet_elearning_app/video_player_screen.dart';
 import 'package:temari_bet_elearning_app/calendar_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // for JSON decoding
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -13,6 +13,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> _topVideos = [];
+  TextEditingController _searchController = TextEditingController();
+  List<dynamic> _searchResults = [];
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -22,6 +25,47 @@ class _HomeScreenState extends State<HomeScreen> {
         _topVideos = videos;
       });
     });
+    _searchController.addListener(_onSearchChanged);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_searchController.text.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+    } else {
+      setState(() {
+        _isSearching = true;
+      });
+      _performSearch(_searchController.text);
+    }
+  }
+
+  Future<void> _performSearch(String query) async {
+    var response = await http.get(
+      Uri.parse('http://192.168.137.62:3000/search?q=$query'),
+    );
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      setState(() {
+        _searchResults = data['videoData'];
+      });
+    } else {
+      setState(() {
+        _searchResults = [];
+      });
+    }
   }
 
   Future<List<dynamic>> fetchTopVideos() async {
@@ -43,25 +87,22 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          Colors.grey[100], // A light grey background for the whole page
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white, // AppBar with white background
         leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Image.asset(
-            'assets/images/App Logo.png',
-            width: 30,
-            height: 30,
-          ),
+          padding: const EdgeInsets.only(left: 16.0),
+          child: Image.asset('assets/images/App Logo.png'),
         ),
-        backgroundColor: const Color.fromARGB(255, 1, 44, 2),
         actions: [
           IconButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ),
+            icon: Icon(Icons.more_vert, color: Colors.black87),
             onPressed: () {},
           ),
         ],
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -70,85 +111,59 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.only(left: 16),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(20),
                   color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 3,
-                      spreadRadius: 2,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: TextField(
+                  controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search',
                     border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search),
+                    suffixIcon: Icon(Icons.search, color: Colors.black87),
                   ),
                 ),
               ),
-              SizedBox(height: 24),
-              _buildGradeSection('Grade 7', [
-                _buildCourseCard(context, 'Math', Colors.lightGreen,
-                    Icons.calculate, 'Math', 7),
-                _buildCourseCard(context, 'English', Colors.lightGreen,
-                    Icons.language, 'English', 7),
-                _buildCourseCard(context, 'Science', Colors.lightGreen,
-                    Icons.science, 'Science', 7),
-                _buildCourseCard(context, 'Amharic', Colors.lightGreen,
-                    Icons.text_fields, 'Amharic', 7),
-                _buildCourseCard(context, 'Social Science', Colors.lightGreen,
-                    Icons.group, 'Social Science', 7),
-                _buildCourseCard(context, 'Civics', Colors.lightGreen,
-                    Icons.people, 'Civics', 7),
-              ]),
-              SizedBox(height: 24),
-              _buildGradeSection('Grade 8', [
-                _buildCourseCard(context, 'Math', Colors.lightBlue,
-                    Icons.calculate, 'Math', 8),
-                _buildCourseCard(context, 'English', Colors.lightBlue,
-                    Icons.language, 'English', 8),
-                _buildCourseCard(context, 'Science', Colors.lightBlue,
-                    Icons.science, 'Science', 8),
-                _buildCourseCard(context, 'Amharic', Colors.lightBlue,
-                    Icons.text_fields, 'Amharic', 8),
-                _buildCourseCard(context, 'Social Science', Colors.lightBlue,
-                    Icons.group, 'Social Science', 8),
-                _buildCourseCard(context, 'Civics', Colors.lightBlue,
-                    Icons.people, 'Civics', 8),
-              ]),
-              SizedBox(height: 24),
-              Text(
-                'Popular Lessons',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              if (_isSearching) ...[
+                SizedBox(height: 24),
+                _buildSearchResults(),
+              ] else ...[
+                SizedBox(height: 24),
+                _buildGradeSections(),
+                SizedBox(height: 30),
+                Text(
+                  'Popular Lessons',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-              _buildPopularLessonsSection(),
+                SizedBox(height: 20),
+                _buildPopularLessonsSection(),
+              ]
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        color: Colors.white,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.home, color: Colors.black87),
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(Icons.favorite),
+              icon: Icon(Icons.favorite_outline, color: Colors.black87),
               onPressed: () {},
             ),
             IconButton(
-              icon: Icon(Icons.calendar_today),
+              icon: Icon(Icons.calendar_today_outlined, color: Colors.black87),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -159,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             IconButton(
-              icon: Icon(Icons.person),
+              icon: Icon(Icons.person_outline, color: Colors.black87),
               onPressed: () {},
             ),
           ],
@@ -168,30 +183,97 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildGradeSection(String title, List<Widget> courses) {
+  Widget _buildSearchResults() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: _searchResults.length,
+      itemBuilder: (context, index) {
+        var result = _searchResults[index];
+        String imageUrl =
+            'http://192.168.137.62:3000/uploads/' + result['image'];
+
+        // Extracting necessary data for video player
+        String videoId = result['_id'];
+        String videoTitle = result['Title'];
+        String videoDescription = result['Description'];
+        String videoUrl = result['urlLink'];
+
+        return ListTile(
+          leading:
+              Image.network(imageUrl, width: 50, height: 50, fit: BoxFit.cover),
+          title: Text(videoTitle),
+          onTap: () {
+            // Navigate to the Video Player Screen with all required details
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VideoPlayerScreen(
+                    videoId: videoId,
+                    videoTitle: videoTitle,
+                    videoDescription: videoDescription,
+                    videoUrl: videoUrl),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildGradeSections() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: courses,
-          ),
-        ),
+        _buildGradeSection('Grade 7', [
+          _buildCourseCard(
+              context, 'Math', Colors.lightGreen, Icons.calculate, 'Math', 7),
+          _buildCourseCard(context, 'English', Colors.lightGreen,
+              Icons.language, 'English', 7),
+          _buildCourseCard(context, 'Science', Colors.lightGreen, Icons.science,
+              'Science', 7),
+          _buildCourseCard(context, 'Amharic', Colors.lightGreen,
+              Icons.text_fields, 'Amharic', 7),
+          _buildCourseCard(context, 'Social Science', Colors.lightGreen,
+              Icons.group, 'Social Science', 7),
+          _buildCourseCard(
+              context, 'Civics', Colors.lightGreen, Icons.people, 'Civics', 7),
+        ]),
+        SizedBox(height: 24),
+        _buildGradeSection('Grade 8', [
+          _buildCourseCard(
+              context, 'Math', Colors.lightBlue, Icons.calculate, 'Math', 8),
+          _buildCourseCard(context, 'English', Colors.lightBlue, Icons.language,
+              'English', 8),
+          _buildCourseCard(context, 'Science', Colors.lightBlue, Icons.science,
+              'Science', 8),
+          _buildCourseCard(context, 'Amharic', Colors.lightBlue,
+              Icons.text_fields, 'Amharic', 8),
+          _buildCourseCard(context, 'Social Science', Colors.lightBlue,
+              Icons.group, 'Social Science', 8),
+          _buildCourseCard(
+              context, 'Civics', Colors.lightBlue, Icons.people, 'Civics', 8),
+        ]),
       ],
     );
   }
 
-  _buildCourseCard(BuildContext context, String title, Color color,
+  Widget _buildGradeSection(String title, List<Widget> courses) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title,
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87)),
+        SizedBox(height: 16),
+        SingleChildScrollView(
+            scrollDirection: Axis.horizontal, child: Row(children: courses)),
+      ],
+    );
+  }
+
+  Widget _buildCourseCard(BuildContext context, String title, Color color,
       IconData icon, String courseName, int grade) {
     return GestureDetector(
       onTap: () {
@@ -211,11 +293,10 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 4,
-              offset: Offset(0, 3),
-            ),
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, 3))
           ],
         ),
         child: ClipRRect(
@@ -223,30 +304,22 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [color.withOpacity(0.8), color.withOpacity(0.6)],
-              ),
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [color.withOpacity(0.8), color.withOpacity(0.6)]),
             ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    icon,
-                    size: 28,
-                    color: Colors.white,
-                  ),
+                  Icon(icon, size: 28, color: Colors.white),
                   SizedBox(height: 8),
-                  Text(
-                    title, // Display title here
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
+                  Text(title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12)),
                 ],
               ),
             ),
@@ -279,12 +352,6 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 8),
             Text(lessonTitle,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            Text(
-              lessonDescription,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
         ),
       ),
