@@ -19,7 +19,7 @@ class CourseLessonsScreen extends StatefulWidget {
 
 class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   List<dynamic> lessons = [];
-  final String baseUrl = 'http://192.168.137.1:3000/uploads/';
+  final String baseUrl = 'http://192.168.137.62:3000/uploads/';
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   Future<void> fetchLessons() async {
     try {
       var url = Uri.parse(
-          'http://192.168.137.1:3000/get_video_data_by_course?course=${widget.courseName}&grade=${widget.gradeLevel}');
+          'http://192.168.137.62:3000/get_video_data_by_course?course=${widget.courseName}&grade=${widget.gradeLevel}');
       print("Fetching data from: $url");
       var response = await http.get(url);
       if (response.statusCode == 200) {
@@ -75,6 +75,7 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
                       'urlLink'], // Assuming 'urlLink' is the key for the video URL in the data
                   () => _navigateToVideoPlayer(
                       context,
+                      lesson['_id'],
                       lesson['Title'],
                       lesson['Description'],
                       lesson['urlLink']), // Pass the video URL here
@@ -142,15 +143,16 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
     );
   }
 
-  void _navigateToVideoPlayer(
-      BuildContext context, String title, String description, String videoUrl) {
+  void _navigateToVideoPlayer(BuildContext context, String videoId,
+      String title, String description, String videoUrl) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => VideoPlayerScreen(
+          videoId: videoId, // Pass the video ID to the video player
           videoTitle: title,
           videoDescription: description,
-          videoUrl: videoUrl, // Pass the video URL to the video player
+          videoUrl: videoUrl,
         ),
       ),
     );
