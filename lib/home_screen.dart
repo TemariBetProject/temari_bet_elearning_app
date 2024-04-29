@@ -58,32 +58,32 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 24),
               _buildGradeSection('Grade 7', [
                 _buildCourseCard(context, 'Math', Colors.lightGreen,
-                    Icons.calculate, 'Math Course'),
+                    Icons.calculate, 'Math', 7),
                 _buildCourseCard(context, 'English', Colors.lightGreen,
-                    Icons.language, 'English Course'),
+                    Icons.language, 'English', 7),
                 _buildCourseCard(context, 'Science', Colors.lightGreen,
-                    Icons.science, 'Science Course'),
+                    Icons.science, 'Science', 7),
                 _buildCourseCard(context, 'Amharic', Colors.lightGreen,
-                    Icons.text_fields, 'Amharic Course'),
+                    Icons.text_fields, 'Amharic', 7),
                 _buildCourseCard(context, 'Social Science', Colors.lightGreen,
-                    Icons.group, 'Social Science Course'),
+                    Icons.group, 'Social Science', 7),
                 _buildCourseCard(context, 'Civics', Colors.lightGreen,
-                    Icons.people, 'Civics Course'),
+                    Icons.people, 'Civics', 7),
               ]),
               SizedBox(height: 24),
               _buildGradeSection('Grade 8', [
                 _buildCourseCard(context, 'Math', Colors.lightBlue,
-                    Icons.calculate, 'Math Course'),
+                    Icons.calculate, 'Math', 8),
                 _buildCourseCard(context, 'English', Colors.lightBlue,
-                    Icons.language, 'English Course'),
+                    Icons.language, 'English', 8),
                 _buildCourseCard(context, 'Science', Colors.lightBlue,
-                    Icons.science, 'Science Course'),
+                    Icons.science, 'Science', 8),
                 _buildCourseCard(context, 'Amharic', Colors.lightBlue,
-                    Icons.text_fields, 'Amharic Course'),
+                    Icons.text_fields, 'Amharic', 8),
                 _buildCourseCard(context, 'Social Science', Colors.lightBlue,
-                    Icons.group, 'Social Science Course'),
+                    Icons.group, 'Social Science', 8),
                 _buildCourseCard(context, 'Civics', Colors.lightBlue,
-                    Icons.people, 'Civics Course'),
+                    Icons.people, 'Civics', 8),
               ]),
               SizedBox(height: 24),
               Text(
@@ -154,17 +154,15 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseCard(BuildContext context, String title, Color color,
-      IconData icon, String courseName) {
+  _buildCourseCard(BuildContext context, String title, Color color,
+      IconData icon, String courseName, int grade) {
     return GestureDetector(
       onTap: () {
-        // Navigate to course lessons screen
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => CourseLessonsScreen(
-                courseName:
-                    title), // Use 'title' directly instead of 'courseName'
+                courseName: title, gradeLevel: grade.toString()),
           ),
         );
       },

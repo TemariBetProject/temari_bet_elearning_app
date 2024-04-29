@@ -5,18 +5,21 @@ import 'package:temari_bet_elearning_app/video_player_screen.dart';
 
 class CourseLessonsScreen extends StatefulWidget {
   final String courseName;
+  final String gradeLevel;
 
-  const CourseLessonsScreen({Key? key, required this.courseName})
-      : super(key: key);
+  const CourseLessonsScreen({
+    Key? key,
+    required this.courseName,
+    required this.gradeLevel,
+  }) : super(key: key);
 
   @override
   _CourseLessonsScreenState createState() => _CourseLessonsScreenState();
 }
 
 class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
-  final String baseUrl = 'http://192.168.253.188:3000/uploads/';
-
   List<dynamic> lessons = [];
+  final String baseUrl = 'http://192.168.137.1:3000/uploads/';
 
   @override
   void initState() {
@@ -27,16 +30,14 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   Future<void> fetchLessons() async {
     try {
       var url = Uri.parse(
-          'http://192.168.253.188:3000/get_video_data_by_course?course=${widget.courseName}');
-      print("Fetching data from: $url"); // This will print the URL being used
+          'http://192.168.137.1:3000/get_video_data_by_course?course=${widget.courseName}&grade=${widget.gradeLevel}');
+      print("Fetching data from: $url");
       var response = await http.get(url);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        print("API response: $data");
         if (data['status']) {
           setState(() {
-            lessons = data[
-                'videoData']; // Assuming 'videoData' contains the list of lessons
+            lessons = data['videoData'];
           });
         } else {
           throw Exception('No video data found');
