@@ -5,6 +5,7 @@ import 'package:temari_bet_elearning_app/video_player_screen.dart';
 import 'package:temari_bet_elearning_app/calendar_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // for JSON decoding
+import 'package:temari_bet_elearning_app/config.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _performSearch(String query) async {
     var response = await http.get(
-      Uri.parse('http://192.168.137.62:3000/search?q=$query'),
+      Uri.parse(fecthserch + '?q=$query'),
     );
     if (response.statusCode == 200) {
       var data = json.decode(response.body);
@@ -70,8 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<dynamic>> fetchTopVideos() async {
     try {
-      var response = await http
-          .get(Uri.parse('http://192.168.137.62:3000/videos/topViews'));
+      var response = await http.get(Uri.parse(topvideo));
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         return data['videoData'];
@@ -190,8 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         var result = _searchResults[index];
-        String imageUrl =
-            'http://192.168.137.62:3000/uploads/' + result['image'];
+        String imageUrl = imageUrls + result['image'];
 
         // Extracting necessary data for video player
         String videoId = result['_id'];
@@ -331,8 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildPopularLessonCard(String lessonTitle, String lessonDescription,
       String imagePath, Function() onTap) {
-    String fullImageUrl = 'http://192.168.137.62:3000/uploads/' +
-        imagePath; // Ensure this is a complete URL
+    String fullImageUrl =
+        imageUrls + imagePath; // Ensure this is a complete URL
     return GestureDetector(
       onTap: onTap,
       child: Container(

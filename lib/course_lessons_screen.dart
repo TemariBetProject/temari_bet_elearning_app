@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // for JSON decoding
 import 'package:temari_bet_elearning_app/video_player_screen.dart';
+import 'package:temari_bet_elearning_app/config.dart';
 
 class CourseLessonsScreen extends StatefulWidget {
   final String courseName;
@@ -19,7 +20,7 @@ class CourseLessonsScreen extends StatefulWidget {
 
 class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   List<dynamic> lessons = [];
-  final String baseUrl = 'http://192.168.137.62:3000/uploads/';
+  final String baseUrl = imageUrls;
 
   @override
   void initState() {
@@ -29,8 +30,8 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
 
   Future<void> fetchLessons() async {
     try {
-      var url = Uri.parse(
-          'http://192.168.137.62:3000/get_video_data_by_course?course=${widget.courseName}&grade=${widget.gradeLevel}');
+      var url = Uri.parse(featchLesson +
+          '?course=${widget.courseName}&grade=${widget.gradeLevel}');
       print("Fetching data from: $url");
       var response = await http.get(url);
       if (response.statusCode == 200) {
