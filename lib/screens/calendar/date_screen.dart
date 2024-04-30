@@ -141,7 +141,6 @@ class _DateScreenState extends State<DateScreen> {
               onPressed: () {
                 if (type != null && course != null) {
                   setState(() {
-                    // Add the selected item to the list
                     dueItems.add('$course $type');
                   });
                 }

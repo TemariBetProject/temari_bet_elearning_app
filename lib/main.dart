@@ -3,8 +3,7 @@ import 'package:temari_bet_elearning_app/screens/authentication/login_screen.dar
 import 'package:temari_bet_elearning_app/screens/authentication/registration_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-
-import 'package:temari_bet_elearning_app/home_screen.dart';
+import 'package:temari_bet_elearning_app/screens/home/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,10 +33,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/login',
+      initialRoute: _getInitialRoute(token),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegistrationScreen(),
+        '/home': (context) => HomeScreen(),
       },
     );
   }

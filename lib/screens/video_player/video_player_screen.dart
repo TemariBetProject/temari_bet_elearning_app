@@ -1,8 +1,7 @@
-// lib/video_player_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:temari_bet_elearning_app/config.dart';
+import 'package:temari_bet_elearning_app/config/app_config.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoId; // Assuming you pass the video database ID
@@ -42,7 +41,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   Future<void> _incrementViewCount() async {
     try {
       var response = await http.patch(
-        Uri.parse(incrementView + '${widget.videoId}/incrementViews'),
+        Uri.parse(
+            AppConfig.incrementViewUrl + '${widget.videoId}/incrementViews'),
       );
       if (response.statusCode == 200) {
         print('View count incremented');

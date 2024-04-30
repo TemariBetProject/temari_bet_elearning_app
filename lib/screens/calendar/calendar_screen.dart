@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:temari_bet_elearning_app/date_screen.dart';
+import 'package:temari_bet_elearning_app/screens/calendar/date_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
   @override
@@ -18,18 +18,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _selectedDate = DateTime.now();
     _currentMonth = DateTime(_selectedDate.year, _selectedDate.month);
     initializeDateFormatting(); // Initialize date formatting
-  }
-
-  void _previousMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
-    });
-  }
-
-  void _nextMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
-    });
   }
 
   @override
@@ -149,6 +137,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
   List<int> _getDaysInMonth(DateTime month) {
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
     return List.generate(daysInMonth, (index) => index + 1);
+  }
+
+  void _previousMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
+    });
+  }
+
+  void _nextMonth() {
+    setState(() {
+      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
+    });
   }
 
   void _navigateToDateScreen(DateTime selectedDate) {

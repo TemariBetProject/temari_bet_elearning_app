@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // for JSON decoding
-import 'package:temari_bet_elearning_app/video_player_screen.dart';
-import 'package:temari_bet_elearning_app/config.dart';
+import 'package:temari_bet_elearning_app/screens/video_player/video_player_screen.dart';
+import 'package:temari_bet_elearning_app/config/app_config.dart';
 
 class CourseLessonsScreen extends StatefulWidget {
   final String courseName;
@@ -20,7 +20,6 @@ class CourseLessonsScreen extends StatefulWidget {
 
 class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   List<dynamic> lessons = [];
-  final String baseUrl = imageUrls;
 
   @override
   void initState() {
@@ -30,7 +29,7 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
 
   Future<void> fetchLessons() async {
     try {
-      var url = Uri.parse(featchLesson +
+      var url = Uri.parse(AppConfig.fetchLessonUrl +
           '?course=${widget.courseName}&grade=${widget.gradeLevel}');
       print("Fetching data from: $url");
       var response = await http.get(url);
@@ -48,8 +47,6 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
       }
     } catch (e) {
       print('Error fetching lessons: $e');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to fetch lessons: $e')));
     }
   }
 
@@ -71,7 +68,8 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
                 return _buildCourseLessonCard(
                   lesson['Title'],
                   lesson['Description'],
-                  baseUrl + lesson['image'], // Ensure the image URL is correct
+                  AppConfig.imageUrl +
+                      lesson['image'], // Ensure the image URL is correct
                   lesson[
                       'urlLink'], // Assuming 'urlLink' is the key for the video URL in the data
                   () => _navigateToVideoPlayer(
@@ -150,7 +148,7 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => VideoPlayerScreen(
-          videoId: videoId, // Pass the video ID to the video player
+          videoId: videoId,
           videoTitle: title,
           videoDescription: description,
           videoUrl: videoUrl,

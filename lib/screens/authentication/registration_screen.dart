@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:temari_bet_elearning_app/screens/authentication/login_screen.dart';
+import 'package:temari_bet_elearning_app/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:temari_bet_elearning_app/config.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -36,17 +35,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         "password": _passwordController.text
       };
 
-      var response = await http.post(Uri.parse(registration),
+      var response = await http.post(Uri.parse(AppConfig.registrationUrl),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(regBody));
 
       var jsonResponse = jsonDecode(response.body);
 
-      print(jsonResponse['status']);
-
       if (jsonResponse['status']) {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()));
+        Navigator.pushNamed(context, '/login');
       } else {
         print("Something went wrong");
       }
@@ -62,27 +58,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
-        backgroundColor: Colors.green, // Set app bar background color
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.green, Colors.green.shade300],
-            ),
-          ),
-        ),
+        backgroundColor: Colors.green,
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.green.shade100],
-          ),
-        ),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
-          padding: const EdgeInsets.all(16.0),
           children: [
             TextField(
               controller: _firstNameController,
@@ -146,12 +126,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async {
-                registerUser();
-              },
+              onPressed: registerUser,
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.green), // Set button background color
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
               ),
               child:
                   const Text('Register', style: TextStyle(color: Colors.white)),
@@ -162,9 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               children: [
                 const Text("Already have an account? "),
                 TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
                   child: const Text('Login',
                       style: TextStyle(color: Colors.green)),
                 ),
