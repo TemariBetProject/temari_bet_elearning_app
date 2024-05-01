@@ -1,5 +1,5 @@
 class AppConfig {
-  static const baseUrl = 'http://192.168.137.31:3000/';
+  static const baseUrl = 'http://192.168.137.62:3000/';
   static const registrationUrl = baseUrl + 'registration';
   static const loginUrl = baseUrl + 'login';
   static const topVideoUrl = baseUrl + 'videos/topViews';

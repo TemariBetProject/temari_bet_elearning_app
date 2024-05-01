@@ -31,17 +31,12 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
     try {
       var url = Uri.parse(AppConfig.fetchLessonUrl +
           '?course=${widget.courseName}&grade=${widget.gradeLevel}');
-      print("Fetching data from: $url");
       var response = await http.get(url);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        if (data['status']) {
-          setState(() {
-            lessons = data['videoData'];
-          });
-        } else {
-          throw Exception('No video data found');
-        }
+        setState(() {
+          lessons = data['videoData'];
+        });
       } else {
         throw Exception('Failed to load lessons');
       }
@@ -68,16 +63,19 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
                 return _buildCourseLessonCard(
                   lesson['Title'],
                   lesson['Description'],
-                  AppConfig.imageUrl +
-                      lesson['image'], // Ensure the image URL is correct
-                  lesson[
-                      'urlLink'], // Assuming 'urlLink' is the key for the video URL in the data
-                  () => _navigateToVideoPlayer(
-                      context,
-                      lesson['_id'],
-                      lesson['Title'],
-                      lesson['Description'],
-                      lesson['urlLink']), // Pass the video URL here
+                  AppConfig.imageUrl + lesson['image'],
+                  lesson['urlLink'],
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => VideoPlayerScreen(
+                        videoId: lesson['_id'],
+                        videoTitle: lesson['Title'],
+                        videoDescription: lesson['Description'],
+                        videoUrl: lesson['urlLink'],
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
@@ -85,9 +83,9 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
   }
 
   Widget _buildCourseLessonCard(String lessonTitle, String lessonDescription,
-      String imagePath, String videoUrl, Function onTap) {
+      String imagePath, String videoUrl, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap as void Function(),
+      onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -137,21 +135,6 @@ class _CourseLessonsScreenState extends State<CourseLessonsScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  void _navigateToVideoPlayer(BuildContext context, String videoId,
-      String title, String description, String videoUrl) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VideoPlayerScreen(
-          videoId: videoId,
-          videoTitle: title,
-          videoDescription: description,
-          videoUrl: videoUrl,
         ),
       ),
     );

@@ -4,7 +4,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:temari_bet_elearning_app/config/app_config.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
-  final String videoId; // Assuming you pass the video database ID
+  final String videoId;
   final String videoTitle;
   final String videoDescription;
   final String videoUrl;
@@ -23,6 +23,7 @@ class VideoPlayerScreen extends StatefulWidget {
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   late YoutubePlayerController _controller;
+  bool _hasIncrementedView = false;
 
   @override
   void initState() {
@@ -31,9 +32,11 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       initialVideoId: YoutubePlayer.convertUrlToId(widget.videoUrl) ?? '',
       flags: YoutubePlayerFlags(autoPlay: true, mute: false),
     );
+
     _controller.addListener(() {
-      if (_controller.value.isPlaying) {
+      if (_controller.value.isPlaying && !_hasIncrementedView) {
         _incrementViewCount();
+        _hasIncrementedView = true;
       }
     });
   }
@@ -60,25 +63,33 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       appBar: AppBar(
         title: Text('Video Player - ${widget.videoTitle}'),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          YoutubePlayer(controller: _controller),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Title: ${widget.videoTitle}',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('Description: ${widget.videoDescription}',
-                    style: TextStyle(fontSize: 16)),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            YoutubePlayer(controller: _controller),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Title: ${widget.videoTitle}',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text('Description: ${widget.videoDescription}',
+                      style: TextStyle(fontSize: 16)),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
