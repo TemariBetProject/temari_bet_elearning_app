@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DateScreen extends StatefulWidget {
   final DateTime selectedDate;
@@ -11,6 +12,24 @@ class DateScreen extends StatefulWidget {
 
 class _DateScreenState extends State<DateScreen> {
   List<String> dueItems = [];
+  late SharedPreferences prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  _loadTasks() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      dueItems = prefs.getStringList(_formatDate(widget.selectedDate)) ?? [];
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month}-${date.day}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +161,8 @@ class _DateScreenState extends State<DateScreen> {
                 if (type != null && course != null) {
                   setState(() {
                     dueItems.add('$course $type');
+                    prefs.setStringList(
+                        _formatDate(widget.selectedDate), dueItems);
                   });
                 }
                 Navigator.of(context).pop();

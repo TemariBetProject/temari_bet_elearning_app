@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:temari_bet_elearning_app/screens/video_player/video_player_screen.dart';
 import 'package:temari_bet_elearning_app/config/app_config.dart';
-import 'package:temari_bet_elearning_app/screens/home/home_screen.dart';
 
 class PopularLessonsSection extends StatelessWidget {
   final List<dynamic> videos;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:temari_bet_elearning_app/screens/calendar/date_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -11,13 +12,34 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   late DateTime _selectedDate;
   late DateTime _currentMonth;
+  late SharedPreferences prefs;
+  Map<String, List<String>> tasksByDate = {};
 
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
     _currentMonth = DateTime(_selectedDate.year, _selectedDate.month);
-    initializeDateFormatting(); // Initialize date formatting
+    initializeDateFormatting();
+    _loadTasksForMonth();
+  }
+
+  void _loadTasksForMonth() async {
+    prefs = await SharedPreferences.getInstance();
+    final daysInMonth = _getDaysInMonth(_currentMonth);
+    Map<String, List<String>> newTasksByDate = {};
+    for (var day in daysInMonth) {
+      DateTime date = DateTime(_currentMonth.year, _currentMonth.month, day);
+      String key = _formatDate(date);
+      newTasksByDate[key] = prefs.getStringList(key) ?? [];
+    }
+    setState(() {
+      tasksByDate = newTasksByDate;
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month}-${date.day}";
   }
 
   @override
@@ -74,13 +96,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     return Expanded(
       child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7,
-        ),
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
         itemCount: weekdays.length + daysInMonth.length,
         itemBuilder: (context, index) {
           if (index < weekdays.length) {
-            // Weekday header
             return Center(
               child: Text(
                 weekdays[index],
@@ -88,42 +108,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ),
             );
           } else {
-            // Calendar day item
-            final day = daysInMonth[index - weekdays.length];
-            final currentDate =
+            int day = daysInMonth[index - weekdays.length];
+            DateTime date =
                 DateTime(_currentMonth.year, _currentMonth.month, day);
-            final isSelected = currentDate == _selectedDate;
-            final isCurrentMonth = currentDate.month == _currentMonth.month;
-            final isToday = currentDate.year == now.year &&
-                currentDate.month == now.month &&
-                currentDate.day == now.day;
+            bool hasTasks =
+                (tasksByDate[_formatDate(date)]?.isNotEmpty ?? false);
+            bool isToday = now.year == date.year &&
+                now.month == date.month &&
+                now.day == date.day;
 
             return InkWell(
-              onTap: () {
-                _navigateToDateScreen(currentDate);
-              },
+              onTap: () => _navigateToDateScreen(date),
               child: Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? Colors.blue
-                      : (isCurrentMonth
-                          ? Colors.transparent
-                          : Colors.grey[200]),
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
-                  border: isToday
-                      ? Border.all(color: Colors.red, width: 2.0)
-                      : null,
+                  border: Border.all(
+                      color: isToday
+                          ? Colors.red
+                          : (hasTasks ? Colors.green : Colors.transparent),
+                      width: 2.0),
                 ),
                 child: Text(
                   '$day',
                   style: TextStyle(
-                    color: isCurrentMonth
-                        ? (isSelected ? Colors.white : Colors.black)
-                        : Colors.grey,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: Colors.black,
+                    fontWeight: FontWeight.normal,
                   ),
                 ),
               ),
@@ -142,12 +154,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
   void _previousMonth() {
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
+      _loadTasksForMonth();
     });
   }
 
   void _nextMonth() {
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
+      _loadTasksForMonth();
     });
   }
 
@@ -157,6 +171,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       MaterialPageRoute(
         builder: (context) => DateScreen(selectedDate: selectedDate),
       ),
-    );
+    ).then((_) => setState(() {
+          _loadTasksForMonth(); // Refresh tasks in case new ones were added
+        }));
   }
 }
