@@ -33,77 +33,91 @@ class _DateScreenState extends State<DateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selected Date'),
+        title: Text('Tasks for ${_formatDate(widget.selectedDate)}'),
+        backgroundColor: theme.primaryColor,
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.lightGreen,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              SizedBox(height: 20),
+              _buildDateInfo(theme),
+              _buildTasksList(theme),
+              SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _showAddDialog,
+                icon: Icon(Icons.add),
+                label: Text('Add Assignment/Exam'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primaryColorDark,
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getDayOfWeek(widget.selectedDate.weekday),
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  '${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+              SizedBox(height: 20),
+            ],
           ),
-          SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Due Assignments/Exams:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _buildDueItemsList(),
-                ),
-              ],
-            ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateInfo(ThemeData theme) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.primaryColorLight,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _getDayOfWeek(widget.selectedDate.weekday),
+            style: theme.textTheme.headline6!.copyWith(color: Colors.white),
           ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _showAddDialog,
-            child: Text('Add Assignment/Exam'),
+          Text(
+            '${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}',
+            style: theme.textTheme.subtitle1!.copyWith(color: Colors.white70),
           ),
         ],
       ),
     );
   }
 
-  List<Widget> _buildDueItemsList() {
-    return dueItems.isEmpty
-        ? [Text('No due assignments/exams')]
-        : dueItems.map((item) => Text('- $item')).toList();
+  Widget _buildTasksList(ThemeData theme) {
+    return Column(
+      children: dueItems.isEmpty
+          ? [Text('No due assignments/exams', style: theme.textTheme.subtitle1)]
+          : dueItems
+              .map((item) => Card(
+                    margin: EdgeInsets.all(8),
+                    child: ListTile(
+                      title: Text(item),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            dueItems.remove(item);
+                            prefs.setStringList(
+                                _formatDate(widget.selectedDate), dueItems);
+                          });
+                        },
+                      ),
+                    ),
+                  ))
+              .toList(),
+    );
   }
 
   void _showAddDialog() {
+    String? type;
+    String? course;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String? type;
-        String? course;
-
         return AlertDialog(
           title: Text('Add Assignment/Exam'),
           content: Column(
@@ -115,17 +129,13 @@ class _DateScreenState extends State<DateScreen> {
                   labelText: 'Type',
                   border: OutlineInputBorder(),
                 ),
-                items: ['Exam', 'Assignment'].map((type) {
+                items: ['Exam', 'Assignment'].map((String type) {
                   return DropdownMenuItem<String>(
                     value: type,
                     child: Text(type),
                   );
                 }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    type = value;
-                  });
-                },
+                onChanged: (value) => type = value,
               ),
               SizedBox(height: 10),
               DropdownButtonFormField<String>(
@@ -141,21 +151,17 @@ class _DateScreenState extends State<DateScreen> {
                   'Amharic',
                   'Social Science',
                   'Civics'
-                ].map((course) {
+                ].map((String course) {
                   return DropdownMenuItem<String>(
                     value: course,
                     child: Text(course),
                   );
                 }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    course = value;
-                  });
-                },
+                onChanged: (value) => course = value,
               ),
             ],
           ),
-          actions: [
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 if (type != null && course != null) {
