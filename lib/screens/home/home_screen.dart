@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    fetchTopVideos(); // Ensure this method is properly awaited or handled
+    fetchTopVideos();
     _searchController.addListener(_onSearchChanged);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         var data = json.decode(response.body)['videoData'];
         setState(() {
-          _topVideos = data; // Ensure setState is called to update the UI
+          _topVideos = data;
         });
       } else {
         throw Exception('Failed to load top videos');
@@ -212,8 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Dismiss the dialog but not log out
+                Navigator.of(context).pop();
               },
               child: Text('Cancel'),
             ),
@@ -221,10 +220,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Log Out'),
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.remove('token'); // Remove the stored token
+                await prefs.remove('token');
                 Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.pushReplacementNamed(
-                    context, '/login'); // Navigate to login screen
+                Navigator.pushReplacementNamed(context, '/login');
               },
             ),
           ],

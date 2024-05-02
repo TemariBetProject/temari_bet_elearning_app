@@ -172,7 +172,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         builder: (context) => DateScreen(selectedDate: selectedDate),
       ),
     ).then((_) => setState(() {
-          _loadTasksForMonth(); // Refresh tasks in case new ones were added
+          _loadTasksForMonth();
         }));
   }
 }

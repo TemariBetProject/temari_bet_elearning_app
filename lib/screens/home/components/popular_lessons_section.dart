@@ -9,7 +9,7 @@ class PopularLessonsSection extends StatelessWidget {
   const PopularLessonsSection({
     Key? key,
     required this.videos,
-    required this.refreshTopVideos, // Initialize here
+    required this.refreshTopVideos,
   }) : super(key: key);
 
   @override
@@ -37,18 +37,16 @@ class PopularLessonsSection extends StatelessWidget {
       onTap: onTap as void Function(),
       child: Container(
         width: 200,
-        margin: EdgeInsets.only(
-            right: 16), // Add spacing on the right for each card
+        margin: EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          border:
-              Border.all(color: Colors.grey.shade300, width: 1), // Add border
+          border: Border.all(color: Colors.grey.shade300, width: 1),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               spreadRadius: 1,
               blurRadius: 3,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -69,10 +67,8 @@ class PopularLessonsSection extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: 8), // Padding for text inside the card
-              height:
-                  90, // Keep the height to accommodate two lines for description.
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              height: 90,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -87,7 +83,7 @@ class PopularLessonsSection extends StatelessWidget {
                     child: Text(
                       lessonDescription,
                       style: TextStyle(fontSize: 12),
-                      maxLines: 2, // Allow for two lines of text.
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

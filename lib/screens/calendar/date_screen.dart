@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:temari_bet_elearning_app/services/notification_service.dart';
 
 class DateScreen extends StatefulWidget {
   final DateTime selectedDate;
@@ -120,58 +121,72 @@ class _DateScreenState extends State<DateScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Assignment/Exam'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: type,
-                decoration: InputDecoration(
-                  labelText: 'Type',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['Exam', 'Assignment'].map((String type) {
-                  return DropdownMenuItem<String>(
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
                     value: type,
-                    child: Text(type),
-                  );
-                }).toList(),
-                onChanged: (value) => type = value,
-              ),
-              SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                value: course,
-                decoration: InputDecoration(
-                  labelText: 'Course',
-                  border: OutlineInputBorder(),
-                ),
-                items: [
-                  'Math',
-                  'English',
-                  'Science',
-                  'Amharic',
-                  'Social Science',
-                  'Civics'
-                ].map((String course) {
-                  return DropdownMenuItem<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: ['Exam', 'Assignment'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() => type = newValue);
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
                     value: course,
-                    child: Text(course),
-                  );
-                }).toList(),
-                onChanged: (value) => course = value,
-              ),
-            ],
+                    decoration: InputDecoration(
+                      labelText: 'Course',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [
+                      'Math',
+                      'English',
+                      'Science',
+                      'Amharic',
+                      'Social Science',
+                      'Civics'
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() => course = newValue);
+                    },
+                  ),
+                ],
+              );
+            },
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
                 if (type != null && course != null) {
+                  String taskName = '$type $course';
+                  DateTime notificationTime =
+                      DateTime.now().add(Duration(minutes: 1));
                   setState(() {
-                    dueItems.add('$course $type');
+                    dueItems.add(taskName);
                     prefs.setStringList(
                         _formatDate(widget.selectedDate), dueItems);
+                    NotificationService()
+                        .scheduleTaskNotification(taskName, notificationTime);
+                    print("Task added and notification scheduled: $taskName");
                   });
                 }
-                Navigator.of(context).pop();
               },
               child: Text('Save'),
             ),

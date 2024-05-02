@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert'; // for JSON decoding
+import 'dart:convert';
 import 'package:temari_bet_elearning_app/screens/video_player/video_player_screen.dart';
 import 'package:temari_bet_elearning_app/config/app_config.dart';
 
